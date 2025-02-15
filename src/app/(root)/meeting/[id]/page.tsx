@@ -31,7 +31,7 @@ const Meeting = ({ params }:{ params: Promise<{ id: string }> }) => {
       setIsCallLoading(false)
     }
     
-    loadCall().then(res => res).catch(err => err)
+    loadCall().then(res => res).catch((err: Error) => err)
   }, [ client, id ])
 
   if(isCallLoading) return (
