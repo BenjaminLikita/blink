@@ -28,7 +28,7 @@ const StreamClientProvider = ({ children }: { children: React.ReactNode }) => {
 
     const client = new StreamVideoClient({ apiKey, user: callUser, tokenProvider });
     setVideoClient(client)
-  }, [user, callUser, isLoaded])
+  }, [user, isLoaded])
 
   if(!videoClient) return (
     <div className='h-screen grid place-items-center'>
