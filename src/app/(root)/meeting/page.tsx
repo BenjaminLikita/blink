@@ -41,8 +41,8 @@ const Meeting = () => {
         }
       }
     })
-
-    router.push(`/meeting/${call.id}`)
+    
+    if(call?.id) router.push(`/meeting/${call.id}`)
   }
 
   const scheduleCall = async () => {
@@ -59,17 +59,7 @@ const Meeting = () => {
       }
     })
 
-    await call.getOrCreate({
-      data: {
-        starts_at: new Date().toISOString(),
-        custom: {
-          description: 'Instant Meeting',
-          link: ''
-        }
-      }
-    })
-
-    setModalCode(call.id)
+    if(call?.id) setModalCode(call.id)
     setIsModalOpen(true)
   }
 
