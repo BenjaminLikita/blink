@@ -1,12 +1,11 @@
-import { ReactionsButton, defaultReactions, useCall, useCallStateHooks, DefaultReactionsMenu } from '@stream-io/video-react-sdk'
+import { defaultReactions, useCall, useCallStateHooks, DefaultReactionsMenu } from '@stream-io/video-react-sdk'
 import React from 'react'
-import { Mic, MoreVerticalIcon, Video, Check, MicOff, VideoOff, Share, MonitorOff, Smile, Router } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Share, MonitorOff, Smile } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { LogoutCurve } from 'iconsax-react';
-import { ICallLayout } from '@/app/(root)/meeting/[id]/page';
 import { useRouter } from 'next/navigation';
 
-const ShareScreenLogoutControls = ({setLayout}:{setLayout: (layout: ICallLayout) => void}) => {
+const ShareScreenLogoutControls = () => {
   const router = useRouter()
   const call = useCall()
 
@@ -16,16 +15,16 @@ const ShareScreenLogoutControls = ({setLayout}:{setLayout: (layout: ICallLayout)
 
   const hasOngoingScreenShare = useHasOngoingScreenShare()
 
-  const leaveCall = () => {
-    call.endCall()
+  const leaveCall = async () => {
+    await call.endCall()
     router.push('/meeting')
   }
 
-  const toggleShareScreen = () => {
+  const toggleShareScreen = async () => {
     if(hasOngoingScreenShare){
-      call.screenShare.disable()
+      await call.screenShare.disable()
     } else {
-      call.screenShare.enable()
+      await call.screenShare.enable()
     }
   }
   const customEmojiReactionMap = {

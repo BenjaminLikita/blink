@@ -1,6 +1,6 @@
 'use client'
 
-import { Call, PaginatedGridLayout, SpeakerLayout, StreamCall, StreamTheme, useCall, useCallStateHooks, useStreamVideoClient, VideoPreview } from '@stream-io/video-react-sdk'
+import { type Call, PaginatedGridLayout, SpeakerLayout, StreamCall, StreamTheme, useCall, useCallStateHooks, useStreamVideoClient, VideoPreview } from '@stream-io/video-react-sdk'
 import Image from 'next/image';
 import React, { use, useEffect, useState } from 'react'
 import logo from '@/assets/logo.png'
@@ -10,7 +10,6 @@ import Link from 'next/link';
 import AudioVideoControls from '@/components/audio_video_controls';
 import ShareScreenLogoutControls from '@/components/shareScreen_logout_controls';
 import MenuParticipantsCount from '@/components/menu_participants_controls';
-import { LayoutGrid, LayoutPanelLeft } from 'lucide-react';
 
 const Meeting = ({ params }:{ params: Promise<{ id: string }> }) => {
   const { id } = use(params)
@@ -29,7 +28,7 @@ const Meeting = ({ params }:{ params: Promise<{ id: string }> }) => {
     const loadCall = async () => {
       const { calls } = await client.queryCalls({ filter_conditions: { id } })
       if(calls.length > 0) setCall(calls[0])
-        setIsCallLoading(false)
+      setIsCallLoading(false)
     }
     
     loadCall()
@@ -123,7 +122,7 @@ const MeetingSetup = ({setSetupComplete}:{setSetupComplete: (value: boolean) => 
         </div>
         
         <div className='flex items-center'>
-          <Button size={'lg'} onClick={() => {call.join(); setSetupComplete(true)}} className='m-auto'>Join Meeting</Button>
+          <Button size={'lg'} onClick={async () => {await call.join(); setSetupComplete(true)}} className='m-auto'>Join Meeting</Button>
         </div>
       </div>
     </div>
@@ -155,7 +154,7 @@ const MeetingRoom = () => {
 
   const { useHasOngoingScreenShare, useCallCustomData } = useCallStateHooks();
   const hasOngoingScreenshare = useHasOngoingScreenShare();
-  const callData = useCallCustomData()
+  // const callData = useCallCustomData()
 
   useEffect(() => {
     // set screen share compatible layout
@@ -190,7 +189,7 @@ const MeetingRoom = () => {
 
       <div className='flex items-center w-full justify-between flex-wrap'>
         <AudioVideoControls />
-        <ShareScreenLogoutControls setLayout={setLayout} />
+        <ShareScreenLogoutControls />
         <MenuParticipantsCount />
       </div>
     </div>

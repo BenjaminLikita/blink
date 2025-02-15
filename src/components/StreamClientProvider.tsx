@@ -1,9 +1,8 @@
 'use client'
 
 import { tokenProvider } from '@/utils/stream.actions'
-import { StreamCall, StreamVideo, StreamVideoClient, User } from '@stream-io/video-react-sdk'
+import { StreamVideo, StreamVideoClient, type User } from '@stream-io/video-react-sdk'
 import React, { useEffect, useState } from 'react'
-import Loader from './loader'
 import { useUser } from '@clerk/nextjs'
 import Image from 'next/image'
 import logo from '@/assets/logo.png'
@@ -15,10 +14,10 @@ const StreamClientProvider = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoaded } = useUser()
   
   const callUser: User = {
-    id: user?.id!,
-    name: user?.firstName!,
+    id: user!.id,
+    name: user!.firstName || "Anonymous",
     // type: 'authenticated'
-    image: user?.imageUrl!
+    image: user!.imageUrl
   }
 
   
@@ -29,7 +28,7 @@ const StreamClientProvider = ({ children }: { children: React.ReactNode }) => {
 
     const client = new StreamVideoClient({ apiKey, user: callUser, tokenProvider });
     setVideoClient(client)
-  }, [user])
+  }, [user, callUser, isLoaded])
 
   if(!videoClient) return (
     <div className='h-screen grid place-items-center'>

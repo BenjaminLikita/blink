@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Camera, Copy } from 'iconsax-react'
+import { Copy } from 'iconsax-react'
 import { Keyboard, Link, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useStreamVideoClient } from '@stream-io/video-react-sdk'
@@ -59,7 +59,7 @@ const Meeting = () => {
       }
     })
 
-    const p = await call.getOrCreate({
+    await call.getOrCreate({
       data: {
         starts_at: new Date().toISOString(),
         custom: {
@@ -116,15 +116,15 @@ export default Meeting
 
 const MeetingModal = ({isOpen, onClose, code}:{isOpen: boolean, onClose: () => void, code: string}) => {
   const { toast } = useToast()
-  const copyMeetingLink = () => {
+  const copyMeetingLink = async () => {
     toast({ description: 'Meeting Link copied!', color: 'red', className: "bg-[#161c21] text-white border-none" })
-    navigator.clipboard.writeText(`http://localhost:3000/meeting/${code}`)
+    await navigator.clipboard.writeText(`http://localhost:3000/meeting/${code}`)
   }
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className='w-[90%] md:w-[50%] !bg-secondary border-none text-white/60'>
         <DialogHeader>
-          <DialogTitle className='font-extralight text-4xl'>Here's your joining info</DialogTitle>
+          <DialogTitle className='font-extralight text-4xl'>{`Here's your joining info`}</DialogTitle>
         </DialogHeader>
         <div className='font-thin'>
           <p>Share this link with people you want to meet with.</p>

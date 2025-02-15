@@ -13,23 +13,23 @@ const AudioVideoControls = () => {
 
   const { devices: cameras, selectedDevice: selectedCamera } = useCameraState()
   const { devices: microphones, selectedDevice: selectedMicrophone } = useMicrophoneState()
-  const { devices: speakers, selectedDevice: selectedSpeaker } = useSpeakerState()
+  // const { devices: speakers, selectedDevice: selectedSpeaker } = useSpeakerState()
 
-  const toggleMic = () => {
+  const toggleMic = async () => {
     const isEnabled = call.microphone.enabled
     if(isEnabled){
-      call.microphone.disable()
+      await call.microphone.disable()
     } else {
-      call.microphone.enable()
+      await call.microphone.enable()
     }
   }
 
-  const toggleCamera = () => {
+  const toggleCamera = async () => {
     const isEnabled = call.camera.enabled
     if(isEnabled){
-      call.camera.disable()
+      await call.camera.disable()
     } else {
-      call.camera.enable()
+      await call.camera.enable()
     }
   }
   return (
