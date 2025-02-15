@@ -15,7 +15,7 @@ const StreamClientProvider = ({ children }: { children: React.ReactNode }) => {
   
   const callUser: User = {
     id: user!.id,
-    name: user!.firstName || "Anonymous",
+    name: user!.firstName ?? "Anonymous",
     // type: 'authenticated'
     image: user!.imageUrl
   }

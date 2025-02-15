@@ -27,11 +27,11 @@ const ShareScreenLogoutControls = () => {
       await call.screenShare.enable()
     }
   }
-  const customEmojiReactionMap = {
-    ...defaultReactions,
-    // ...defaultEmojiReactionMap,
-    ":lol:": "😂",
-  };
+  // const customEmojiReactionMap = {
+  //   ...defaultReactions,
+  //   // ...defaultEmojiReactionMap,
+  //   ":lol:": "😂",
+  // };
   return (
     <div className='flex gap-3'>
       {/* SHARE SCREEN */}

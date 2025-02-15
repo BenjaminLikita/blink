@@ -9,7 +9,7 @@ const AudioVideoControls = () => {
 
   if(!call) throw new Error('Use Call must be used within StreamCallComponent')
 
-  const { useMicrophoneState, useCameraState, useSpeakerState } = useCallStateHooks()
+  const { useMicrophoneState, useCameraState } = useCallStateHooks()
 
   const { devices: cameras, selectedDevice: selectedCamera } = useCameraState()
   const { devices: microphones, selectedDevice: selectedMicrophone } = useMicrophoneState()

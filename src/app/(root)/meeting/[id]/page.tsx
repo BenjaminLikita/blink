@@ -31,7 +31,7 @@ const Meeting = ({ params }:{ params: Promise<{ id: string }> }) => {
       setIsCallLoading(false)
     }
     
-    loadCall()
+    loadCall().then(res => res)
   }, [ client, id ])
 
   if(isCallLoading) return (
@@ -74,25 +74,9 @@ export default Meeting
 
 const MeetingSetup = ({setSetupComplete}:{setSetupComplete: (value: boolean) => void}) => {
 
-  const [isMicCamToggledOn, setIsMicCamToggledOn] = useState(false)
   const call = useCall()
-  
-  
 
-  if(!call) throw new Error('Use Call must be used within StreamCallComponent')
-  
-  // useEffect(() => {
-  //   if(isMicCamToggledOn){
-  //     call?.camera.disable()
-  //     call?.microphone.disable()
-  //   } else{
-  //     call?.camera.enable()
-  //     call?.microphone.enable()
-  //   }
-
-  // }, [isMicCamToggledOn, call?.camera, call?.microphone])
-
-  
+  if(!call) throw new Error('Use Call must be used within StreamCallComponent')  
 
   return (
     <div className='flex h-screen w-full flex-col items-center justify-center gap-14 text-white'>
@@ -134,11 +118,6 @@ export type ICallLayout = 'grid' | 'speaker-left' | 'speaker-right'
 const MeetingRoom = () => {
   const [layout, setLayout] = useState<ICallLayout>('speaker-left')
 
-  const call = useCall()
-
-  const { useCallCallingState, useCallMembers, useLocalParticipant, useRemoteParticipants } = useCallStateHooks()
-  // call?.screenShare.enable()
-
   const CallLayout = () => {
     switch (layout) {
       case 'grid':
@@ -152,7 +131,7 @@ const MeetingRoom = () => {
     }
   }
 
-  const { useHasOngoingScreenShare, useCallCustomData } = useCallStateHooks();
+  const { useHasOngoingScreenShare } = useCallStateHooks();
   const hasOngoingScreenshare = useHasOngoingScreenShare();
   // const callData = useCallCustomData()
 
