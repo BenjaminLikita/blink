@@ -47,7 +47,8 @@ export async function POST(req: Request) {
     email: email_addresses[0]!.email_address,
     firstName: first_name,
     lastName: last_name,
-    profileImage: profile_image_url
+    profileImage: profile_image_url,
+    clerkUserId: id
   })
 
   return new Response('User created', { status: 200 })
