@@ -11,6 +11,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { db } from "@/server/db";
+import { auth } from "@clerk/nextjs/server";
 
 /**
  * 1. CONTEXT
@@ -96,6 +97,20 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
   return result;
 });
 
+const authMiddleware = t.middleware(async ({ next, ctx }) => {
+  const { userId } = await auth()
+
+  if(!userId) throw new Error("User must be authenticated")
+  return next({
+    ctx: {
+      ...ctx,
+      user: {
+        userId
+      }
+    }
+  })
+})
+
 /**
  * Public (unauthenticated) procedure
  *
@@ -104,3 +119,4 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
  * are logged in.
  */
 export const publicProcedure = t.procedure.use(timingMiddleware);
+export const privateProcedure = t.procedure.use(authMiddleware);
