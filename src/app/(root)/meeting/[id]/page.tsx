@@ -106,7 +106,7 @@ const MeetingSetup = ({setSetupComplete}:{setSetupComplete: (value: boolean) => 
         </div>
         
         <div className='flex items-center'>
-          <Button size={'lg'} onClick={async () => {await call.join(); setSetupComplete(true)}} className='m-auto'>Join Meeting</Button>
+          <Button size={'lg'} onClick={async () => {await call.join({ notify: true }); setSetupComplete(true)}} className='m-auto'>Join Meeting</Button>
         </div>
       </div>
     </div>

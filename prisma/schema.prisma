@@ -6,12 +6,12 @@ generator client {
 }
 
 datasource db {
-    provider = "mongodb"
+    provider = "postgresql"
     url      = env("DATABASE_URL")
 }
 
 model Post {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    id        String   @id @default(cuid())
     name      String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -19,24 +19,25 @@ model Post {
     @@index([name])
 }
 
-
 model User {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
-    clerkUserId String   @unique
-    firstName String
-    lastName  String
-    profileImage String?
-    email     String   @unique
-    hostedMeetings Meeting[]
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    id             String    @id @default(cuid())
+    firstName      String
+    lastName       String
+    profileImage   String?
+    email          String    @unique
+    hostedMeetings Meeting[] @relation("hostedMeetings")
+    attendedMeetings Meeting[] @relation("attendedMeetings")
+    createdAt      DateTime  @default(now())
+    updatedAt      DateTime  @updatedAt
 }
 
 model Meeting {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    id        String   @id @default(cuid())
+    streamId  String   @unique
     name      String
-    hostId    String   @unique @db.ObjectId
-    host      User     @relation(fields: [hostId], references: [id], onDelete: Cascade) 
+    hostId    String   @unique
+    host      User     @relation("hostedMeetings", fields: [hostId], references: [id], onDelete: Cascade)
+    attendees User[]   @relation("attendedMeetings")
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 

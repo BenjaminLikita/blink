@@ -7,23 +7,47 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Copy } from 'iconsax-react'
-import { Keyboard, Link, Plus } from 'lucide-react'
+import { Keyboard, Link as LinkIcon, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useStreamVideoClient } from '@stream-io/video-react-sdk'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useToast } from "@/hooks/use-toast"
 import { nanoid } from 'nanoid'
+import { api } from '@/trpc/react'
+import Link from 'next/link'
 
 const Meeting = () => {
   const [code, setCode] = useState('')
+
+  const { data: meeting, refetch: getMeeting } = api.meeting.getMeeting.useQuery({ id: code }, { enabled: false })
+  const [isLoading, setIsLoading] = useState(false)
+
+  const { mutateAsync: createMeeting } = api.meeting.create.useMutation()
+  const { mutateAsync: joinMeeting } = api.meeting.join.useMutation()
+  
 
   const router = useRouter()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalCode, setModalCode] = useState('')
 
-  const joinMeetingWithId = () => {
+  const joinMeetingWithId = async () => {
+    setIsLoading(true)
+    const { data } = await getMeeting()
+    if(!data){
+      setIsLoading(false)
+      return
+    }
+
+    await joinMeeting({ meetingId: data.streamId })
     router.push(`/meeting/${code}`)
+    // getMeeting({ id: code })
+    // console.log({meeting})
+
+    // if(meeting){
+    //   console.log({meeting})
+    // }
   }
 
   const client = useStreamVideoClient()!
@@ -39,10 +63,17 @@ const Meeting = () => {
           description: 'Instant Meeting',
           link: ''
         }
-      }
+      },
     })
-    
-    if(call?.id) router.push(`/meeting/${call.id}`)
+
+    if(call?.id){
+      await createMeeting({
+        name: "Instant Meeting",
+        streamId: call.id,
+      })
+      
+      router.push(`/meeting/${call.id}`)
+    }
   }
 
   const scheduleCall = async () => {
@@ -59,7 +90,13 @@ const Meeting = () => {
       }
     })
 
-    if(call?.id) setModalCode(call.id)
+    if(call?.id) {
+      await createMeeting({
+        name: "Instant Meeting",
+        streamId: call.id,
+      })
+      setModalCode(call.id)
+    }
     setIsModalOpen(true)
   }
 
@@ -81,7 +118,7 @@ const Meeting = () => {
               <Button className='rounded-full hover:scale-[1.04] hover:shadow-sm hover:bg-primary transition-all duration-300'><Plus color='#fff' />New Meeting</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 bg-secondary border-none text-white">
-              <DropdownMenuItem className='hover:!bg-white/20 cursor-pointer' onClick={scheduleCall}><Link /> Create a Meeting for later</DropdownMenuItem>
+              <DropdownMenuItem className='hover:!bg-white/20 cursor-pointer' onClick={scheduleCall}><LinkIcon /> Create a Meeting for later</DropdownMenuItem>
               <DropdownMenuItem className='hover:!bg-white/20 cursor-pointer' onClick={createCall}><Plus /> Start an Instant meeting</DropdownMenuItem>
               <DropdownMenuItem className='hover:!bg-white/20 cursor-pointer'>Item 3</DropdownMenuItem>
             </DropdownMenuContent>
@@ -93,8 +130,17 @@ const Meeting = () => {
           <Button variant={'ghost'} className='rounded-full !p-0 hover:scale-[1.04] hover:shadow-sm !bg-transparent hover:!bg-[#18e6df23] hover:!text-primary transition-all' disabled={code.length === 0} onClick={joinMeetingWithId}>Join</Button>
         </div>
       </div>
+      
+      <div className='mt-20'>
+        <div className='flex items-center justify-between border-y p-4'>
+          <h1 className='font-medium text-xl'>Meeting History</h1>
+          <Link href={'/all-meetings'} className='underline'>See all</Link>
+        </div>
+      </div>
       {/* <h1 className='text-4xl font-light text-white/80 text-center'>Get Started</h1>
       <p className='text-gray-500'>This is the meeting page.</p> */}
+
+      <LoadingModal isOpen={isLoading} />
       <MeetingModal code={modalCode} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   )
@@ -137,5 +183,17 @@ const MeetingModal = ({isOpen, onClose, code}:{isOpen: boolean, onClose: () => v
         </div>
       </DialogContent>
     </Dialog>
+  )
+}
+
+const LoadingModal = ({isOpen}:{isOpen: boolean}) => {
+  return (
+    <AlertDialog open={isOpen}>
+      <AlertDialogContent className='border-none text-white/60 bg-transparent flex flex-col items-center justify-center'>
+        <AlertDialogTitle></AlertDialogTitle>
+        <Image src={logo} width={100} className='animate-bounce' alt='blink-logo' />
+        <h1 className='text-2xl font-bold'>Loading Call...</h1>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
