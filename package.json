@@ -18,7 +18,8 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "preview": "next build && next start",
-    "start": "next start",
+    "start": "node dist/server.js",
+    "start:": "next start",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
