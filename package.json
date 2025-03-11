@@ -50,6 +50,8 @@
     "react-dom": "^18.3.1",
     "react-spinners": "^0.15.0",
     "server-only": "^0.0.1",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "superjson": "^2.2.1",
     "svix": "^1.57.0",
     "tailwind-merge": "^3.0.1",
