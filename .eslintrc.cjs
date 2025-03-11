@@ -1,5 +1,7 @@
 /** @type {import("eslint").Linter.Config} */
 const config = {
+  files: ["**/*.{js,mjs,cjs,ts}"],
+  languageOptions: { globals: { browser: true } },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": true

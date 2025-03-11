@@ -25,10 +25,15 @@ export const meetingRouter = createTRPCRouter({
 
   getMeetings: privateProcedure.query(async ({ ctx }) => {
     const hostId = ctx.user.userId
-    const user = await ctx.db.meeting.findMany({
-      where: { hostId }
+    const meetings = await ctx.db.meeting.findMany({
+      where: { 
+        OR: [
+          { hostId: hostId },
+          { attendees: { some: { id: hostId } } }
+        ]
+       }
     })
-    return user
+    return meetings
   }),
 
 
@@ -38,9 +43,10 @@ export const meetingRouter = createTRPCRouter({
     const meeting = await ctx.db.meeting.findUnique({
       where: { streamId: input.meetingId }
     })
+    if(!meeting) throw new Error('Meeting not found')
     const userId = ctx.user.userId
     await ctx.db.meeting.update({
-      where: { id: input.meetingId },
+      where: { id: meeting.id },
       data: { attendees: { connect: { id: userId } } }
     })
     return meeting

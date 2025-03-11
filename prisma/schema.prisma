@@ -35,7 +35,7 @@ model Meeting {
     id        String   @id @default(cuid())
     streamId  String   @unique
     name      String
-    hostId    String   @unique
+    hostId    String   
     host      User     @relation("hostedMeetings", fields: [hostId], references: [id], onDelete: Cascade)
     attendees User[]   @relation("attendedMeetings")
     createdAt DateTime @default(now())

@@ -16,7 +16,8 @@ const ShareScreenLogoutControls = () => {
   const hasOngoingScreenShare = useHasOngoingScreenShare()
 
   const leaveCall = async () => {
-    await call.endCall()
+    // await call.endCall()
+    await call.leave({ reason: "leave call" })
     router.push('/meeting')
   }
 

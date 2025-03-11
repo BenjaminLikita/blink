@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import logo from '@/assets/logo.png'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -17,11 +17,14 @@ import { useToast } from "@/hooks/use-toast"
 import { nanoid } from 'nanoid'
 import { api } from '@/trpc/react'
 import Link from 'next/link'
+import { dateToTime, formatDate } from '@/utils/helpers'
+import useGetCalls from '@/hooks/useGetCalls'
+import { useAuth } from '@clerk/nextjs'
+import { joinRoom } from '@/hooks/use-websocket'
 
 const Meeting = () => {
   const [code, setCode] = useState('')
 
-  const { data: meeting, refetch: getMeeting } = api.meeting.getMeeting.useQuery({ id: code }, { enabled: false })
   const [isLoading, setIsLoading] = useState(false)
 
   const { mutateAsync: createMeeting } = api.meeting.create.useMutation()
@@ -31,38 +34,57 @@ const Meeting = () => {
   const router = useRouter()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalCode, setModalCode] = useState('')
+  const { userId } = useAuth()
 
   const joinMeetingWithId = async () => {
     setIsLoading(true)
-    const { data } = await getMeeting()
-    if(!data){
+    const { calls } = await client.queryCalls({ 
+      filter_conditions: { id: code }
+    })
+    const call = calls[0]
+    if(!call){
       setIsLoading(false)
       return
     }
 
-    await joinMeeting({ meetingId: data.streamId })
+    // await joinMeeting({ meetingId: call.id })
     router.push(`/meeting/${code}`)
-    // getMeeting({ id: code })
-    // console.log({meeting})
-
-    // if(meeting){
-    //   console.log({meeting})
-    // }
   }
 
   const client = useStreamVideoClient()!
+  const { calls: meetings, isLoading: loadingMeetings } = useGetCalls()
 
   const createCall = async () => {
     const callId = nanoid(6)
 
-    const call = client.call('default', callId)
+    const call = client.call('private-meeting', callId)
+
+    // call.updateCallMembers({
+    //   update_members: [ { user_id: "userId", role: 'host' } ]
+    // })
+    // call.updateUserPermissions({
+    //   grant_permissions: ['join', 'publish', 'subscribe'],
+    //   user_id: "userId"
+    // })
+    
     await call.getOrCreate({
       data: {
         starts_at: new Date().toISOString(),
         custom: {
           description: 'Instant Meeting',
           link: ''
-        }
+        },
+        // settings_override: {
+        //   backstage: {
+        //     enabled: false
+        //   },
+        //   video: {
+        //     access_request_enabled: true
+        //   }
+        // },
+        members: [
+          { user_id: userId!, role: 'call_member' }
+        ]
       },
     })
 
@@ -79,22 +101,28 @@ const Meeting = () => {
   const scheduleCall = async () => {
     const callId = nanoid(6)
 
-    const call = client.call('default', callId)
+    // const call = client.call('default', callId)
+    const call = client.call('private-meeting', callId)
+    joinRoom(callId)
     await call.getOrCreate({
       data: {
         starts_at: new Date().toISOString(),
         custom: {
           description: 'Instant Meeting',
           link: ''
-        }
+        },
+        members: [
+          
+        ]
       }
+
     })
 
     if(call?.id) {
-      await createMeeting({
-        name: "Instant Meeting",
-        streamId: call.id,
-      })
+      // await createMeeting({
+      //   name: "Instant Meeting",
+      //   streamId: call.id,
+      // })
       setModalCode(call.id)
     }
     setIsModalOpen(true)
@@ -132,13 +160,31 @@ const Meeting = () => {
       </div>
       
       <div className='mt-20'>
-        <div className='flex items-center justify-between border-y p-4'>
+        <div className='flex items-center justify-between border-y border-white/40 p-4'>
           <h1 className='font-medium text-xl'>Meeting History</h1>
           <Link href={'/all-meetings'} className='underline'>See all</Link>
         </div>
+        {
+          loadingMeetings ? (
+            <div className='h-[30vh] grid place-items-center'>
+              <Image width={50} className='animate-bounce' src={logo} alt='blink-logo' />
+            </div>
+          ) : !meetings || meetings?.length === 0 ? (
+            <div className='h-[30vh] grid place-items-center'>
+              <h1>No Meetings found</h1>
+            </div>
+          ) : meetings.slice(0, 5).map(({id, state}) => (
+            <div key={id} className='flex gap-5 items-center py-2 text-sm border-b border-white/40'>
+              <h1>{dateToTime(state.createdAt)}</h1>
+              <div>
+                <p>{formatDate(state.createdAt)}</p>
+                <h1 className='font-semibold text-xl'>{state.custom.description}</h1>
+                <p>Meeting ID: {id}</p>
+              </div>
+            </div>
+          ))
+        }
       </div>
-      {/* <h1 className='text-4xl font-light text-white/80 text-center'>Get Started</h1>
-      <p className='text-gray-500'>This is the meeting page.</p> */}
 
       <LoadingModal isOpen={isLoading} />
       <MeetingModal code={modalCode} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />

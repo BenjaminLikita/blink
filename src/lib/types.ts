@@ -1,0 +1,1 @@
+export type ICallLayout = 'grid' | 'speaker-left' | 'speaker-right'
