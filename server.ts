@@ -1,9 +1,7 @@
 import { createServer } from 'http'
-import { parse } from 'url'
 import next from 'next'
 // import { WebSocketServer } from 'ws'
 import { Server } from 'socket.io'
-import { v4 as uuidv4 } from 'uuid'
 
 const port = parseInt(process.env.PORT || '3000', 10)
 const dev = process.env.NODE_ENV !== 'production'

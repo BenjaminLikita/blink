@@ -18,8 +18,8 @@
     "lib": ["dom", "dom.iterable", "ES2022"],
     "noEmit": true,
     "module": "ESNext",
-    "moduleResolution": "node",
-    // "moduleResolution": "Bundler",
+    // "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "jsx": "preserve",
     "plugins": [{ "name": "next" }],
     "incremental": true,
@@ -31,7 +31,7 @@
     }
   },
   "include": [
-    ".eslintrc.cjs",
+    ".eslintrc.mjs",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
