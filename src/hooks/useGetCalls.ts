@@ -8,12 +8,12 @@ const useGetCalls = () => {
   const [isLoading, setLoading] = useState(false)
   const [calls, setCalls] = useState<Call[]>([])
 
-  if(!client) return { isLoading }
   const { userId } = useAuth()
-
+  
   useEffect(() => {
     const getCalls = async () => {
       setLoading(true)
+      if(!client) return
       const { calls } = await client.queryCalls({ 
         filter_conditions: {
           $or: [
@@ -26,7 +26,9 @@ const useGetCalls = () => {
       setLoading(false)
     }
     getCalls()
-  }, [])
+  }, [client, userId])
+
+  if(!client) return { calls: [], isLoading }
 
   return { calls, isLoading }
 }

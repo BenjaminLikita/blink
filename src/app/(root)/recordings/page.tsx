@@ -3,17 +3,13 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { formatDate, formatDurationBetweenDates } from '@/lib/utils'
-import { useAuth } from '@clerk/nextjs'
-import { Call, CallRecording, useCall, useStreamVideoClient } from '@stream-io/video-react-sdk'
+import { Call, useStreamVideoClient } from '@stream-io/video-react-sdk'
 import { HardDriveDownload, Share2, Trash } from 'lucide-react'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import logo from '@/assets/logo.png'
 import Image from 'next/image'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
-import { useToast } from '@/hooks/use-toast'
-import { set } from 'date-fns'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 
 interface ICallRecording{
   id: string
@@ -43,7 +39,6 @@ const Recordings = () => {
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false)
   const [loadingRecordings, setLoadingRecordings] = useState(false)
   const client = useStreamVideoClient()
-  const { userId } = useAuth()
   
   useEffect(() => {
     const getRecordings = async () => {
@@ -59,8 +54,8 @@ const Recordings = () => {
           const splitFilename = recording.filename.split('_')
           const type = splitFilename[1]!
           const id = splitFilename[4]!
-          let startTime = new Date(recording.start_time)
-          let endTime = new Date(recording.end_time)
+          const startTime = new Date(recording.start_time)
+          const endTime = new Date(recording.end_time)
           const duration = formatDurationBetweenDates(startTime, endTime)
           const date = formatDate(recording.start_time)
 
@@ -82,7 +77,7 @@ const Recordings = () => {
       })
     }
     getRecordings()
-  }, [])
+  }, [client])
 
   const deleteRecording = ({session, callId, filename}: { session: string, callId: string, filename: string }) => {
     setOpenDeleteModal(true)
@@ -139,7 +134,7 @@ const Recordings = () => {
                 </div>
                 </td>
               </tr>
-            ) : recordings?.map(({ duration, name, id, callId, type, url, date, sessionId, filename }, index) => (
+            ) : recordings?.map(({ duration, name, callId, type, url, date, sessionId, filename }, index) => (
               <tr key={index} className='border-b border-white/40'>
                 <td className='py-5'>
                   <button>play</button>
@@ -183,8 +178,6 @@ export default Recordings
 
 
 const DeleteRecordingDialog = ({isOpen, onClose, callData}:{isOpen: boolean, onClose: () => void, callData: { session: string, filename: string, callId: string } }) => {
-  // const call = useCall()
-  const { toast } = useToast()
   const client = useStreamVideoClient()
   const deleteRecording = async () => {
     // toast({ description: 'Recording deleted', color: 'green', className: "bg-[#161c21] text-white border-none" })
@@ -192,17 +185,14 @@ const DeleteRecordingDialog = ({isOpen, onClose, callData}:{isOpen: boolean, onC
     if(!client) return
 
     const { calls } = await client.queryCalls({ filter_conditions: { id: callData.callId } })
-    const call = calls[0] as any
+    const call = calls[0] as Call
     if(!call) return
-    await call.deleteRecording({ session: callData.session, filename: callData.filename });
+    //await call.deleteRecording({ session: callData.session, filename: callData.filename });
     
     // onClose()
   }
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
-      {/* <AlertDialogTrigger asChild>
-        <Button variant="outline">Show Dialog</Button>
-      </AlertDialogTrigger> */}
       <AlertDialogContent className='w-[90%] md:w-[50%] !bg-secondary border-none text-white/60'>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure you want to delete this recording?</AlertDialogTitle>

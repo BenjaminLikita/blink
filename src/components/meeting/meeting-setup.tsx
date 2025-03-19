@@ -4,7 +4,7 @@
 
 import { requestPrivateCallAccess, socket } from "@/hooks/use-websocket"
 import { useAuth, useUser } from "@clerk/nextjs"
-import { useCall, useCallStateHooks, VideoPreview } from "@stream-io/video-react-sdk"
+import { useCall, VideoPreview } from "@stream-io/video-react-sdk"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 import AudioVideoControls from "./audio_video_controls"
@@ -22,10 +22,6 @@ const MeetingSetup = ({setSetupComplete, callId}:{setSetupComplete: (value: bool
   if(!call) throw new Error('Use Call must be used within StreamCallComponent')
   const [pendingAccess, setPendingAccess] = useState(false)
 
-  const { useCallMembers, useParticipants, useRemoteParticipants } = useCallStateHooks()
-  const participants = useParticipants()
-  const remoteParticipants = useRemoteParticipants()
-  const callMembers = useCallMembers()
 
   const { user } = useUser()
   useEffect(() => {
@@ -33,9 +29,9 @@ const MeetingSetup = ({setSetupComplete, callId}:{setSetupComplete: (value: bool
       await call.microphone.enable()
       await call.camera.enable()
     }
-    // enableDevices()
+    enableDevices()
 
-    socket.on("acceptedPrivateCallAccess", async (data) => {
+    socket.on("acceptedPrivateCallAccess", async (_data) => {
       await call.join({ 
         notify: true, 
         data: { 
@@ -57,7 +53,7 @@ const MeetingSetup = ({setSetupComplete, callId}:{setSetupComplete: (value: bool
       })
       setSetupComplete(true)
     })
-  }, [])
+  }, [call, setSetupComplete])
 
   const joinMeeting = async () => {
     if(call?.type === 'private-meeting' && !call?.isCreatedByMe){

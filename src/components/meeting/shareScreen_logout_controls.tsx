@@ -16,7 +16,6 @@ const ShareScreenLogoutControls = () => {
   const hasOngoingScreenShare = useHasOngoingScreenShare()
 
   const leaveCall = async () => {
-    // await call.endCall()
     await call.leave({ reason: "leave call" })
     router.push('/meeting')
   }
@@ -28,11 +27,6 @@ const ShareScreenLogoutControls = () => {
       await call.screenShare.enable()
     }
   }
-  // const customEmojiReactionMap = {
-  //   ...defaultReactions,
-  //   // ...defaultEmojiReactionMap,
-  //   ":lol:": "😂",
-  // };
   return (
     <div className='flex gap-3'>
       {/* SHARE SCREEN */}

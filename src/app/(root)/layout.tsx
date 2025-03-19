@@ -1,7 +1,6 @@
 import React from 'react'
 import StreamClientProvider from '@/components/StreamClientProvider'
 import SideNav from '@/components/side-nav'
-import { ClerkLoaded, ClerkLoading } from '@clerk/nextjs'
 
 const RootLayout = ({children}:{children: React.ReactNode}) => {
   return (

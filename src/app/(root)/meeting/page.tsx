@@ -1,13 +1,13 @@
 'use client'
 
 import Image from 'next/image'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import logo from '@/assets/logo.png'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
+import { AlertDialog, AlertDialogContent, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Copy } from 'iconsax-react'
 import { Keyboard, Link as LinkIcon, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -28,7 +28,7 @@ const Meeting = () => {
   const [isLoading, setIsLoading] = useState(false)
 
   const { mutateAsync: createMeeting } = api.meeting.create.useMutation()
-  const { mutateAsync: joinMeeting } = api.meeting.join.useMutation()
+  // const { mutateAsync: joinMeeting } = api.meeting.join.useMutation()
   
 
   const router = useRouter()
