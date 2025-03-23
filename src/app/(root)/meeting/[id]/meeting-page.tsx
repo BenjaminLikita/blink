@@ -16,7 +16,7 @@ const Meeting = ({ params }:{ params: Promise<{ id: string }> }) => {
 
   useEffect(() => {
     joinRoom(id)
-  }, [])
+  }, [id])
 
   const [call, setCall] = useState<Call>()
   const [isCallLoading, setIsCallLoading] = useState(true)
