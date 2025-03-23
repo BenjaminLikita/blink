@@ -19,8 +19,8 @@ const app = next({ dev, turbo: true, conf: { reactStrictMode: true,
 const handle = app.getRequestHandler()
 
 // Store active connections and meeting rooms
-const clients = new Map()
-const meetings = new Map()
+const _clients = new Map()
+const _meetings = new Map()
 
 // Initialize the app
 app.prepare().then(() => {

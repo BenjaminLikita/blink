@@ -2,8 +2,8 @@
 
 import { socket } from "@/hooks/use-websocket"
 import { ICallLayout } from "@/lib/types"
-import { OwnCapability, PaginatedGridLayout, RecordCallButton, SpeakerLayout, StreamCallEvent, useCall, useCallStateHooks } from "@stream-io/video-react-sdk"
-import { useEffect, useState } from "react"
+import { PaginatedGridLayout, RecordCallButton, SpeakerLayout, StreamCallEvent, useCall, useCallStateHooks } from "@stream-io/video-react-sdk"
+import { useCallback, useEffect, useState } from "react"
 import AudioVideoControls from "./audio_video_controls"
 import ShareScreenLogoutControls from "./shareScreen_logout_controls"
 import MenuParticipantsCount from "./menu_participants_controls"
@@ -15,13 +15,13 @@ const MeetingRoom = () => {
   const [layout, setLayout] = useState<ICallLayout>('speaker-left')
   const call = useCall()
 
-  const acceptUser = async ({ userId, roomId }: { userId: string, roomId: string }) => {
+  const acceptUser = useCallback(async ({ userId, roomId }: { userId: string, roomId: string }) => {
     if(!socket || !call) return
     await call.updateCallMembers({
       update_members: [ { user_id: userId, role: 'call_member' } ]
     })
     socket.emit('acceptedPrivateCallAccess', {roomId, userId})
-  }
+  }, [call])
 
   useEffect(() => {
     if(!socket || !call) return
@@ -45,7 +45,7 @@ const MeetingRoom = () => {
     return () => {
       socket.off('roomMessage')
     }
-  }, [])
+  }, [call, acceptUser])
 
 
   const CallLayout = () => {
@@ -62,13 +62,13 @@ const MeetingRoom = () => {
   }
 
 
-  call?.on("call.recording_started", async (event: StreamCallEvent) => {
+  call?.on("call.recording_started", async (_event: StreamCallEvent) => {
     toast({ description: 'Call recording started', color: 'green', className: "bg-[#161c21] text-white border-none" })
     const audio = new Audio('/assets/record_start.mp3')
     audio.play().catch(error => console.error(error))
   })
 
-  call?.on("call.recording_stopped", async (event: StreamCallEvent) => {
+  call?.on("call.recording_stopped", async (_event: StreamCallEvent) => {
     toast({ description: 'Call recording stopped', color: 'green', className: "bg-[#161c21] text-white border-none" })
   })
 
@@ -76,7 +76,11 @@ const MeetingRoom = () => {
   const hasOngoingScreenshare = useHasOngoingScreenShare();
 
   useEffect(() => {
-    hasOngoingScreenshare ? setLayout("speaker-left") : setLayout("grid");
+    if(hasOngoingScreenshare){
+      setLayout("speaker-left")
+    } else{
+      setLayout("grid")
+    }
   }, [hasOngoingScreenshare]);
 
   return (
