@@ -1,5 +1,18 @@
 {
   "buildCommand": "bun run build:socket",
   "outputDirectory": "dist",
-  "devCommand": "bun run dev:socket"
+  "devCommand": "bun run dev:socket",
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "./server.mts",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ]
+    }
+  ]
 }
