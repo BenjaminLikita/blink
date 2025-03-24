@@ -1,6 +1,6 @@
 {
   "builds": [
-    { "src": "./server.mts", "use": "@vercel/node" }
+    { "src": "**/*", "use": "@vercel/node" }
   ],
   "routes": [
     { "src": "/(.*)", "dest": "/" }
