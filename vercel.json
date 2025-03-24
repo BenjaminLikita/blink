@@ -1,8 +1,5 @@
 {
-  "builds": [
-    { "src": "**/*", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "/" }
-  ]
+  "buildCommand": "bun run build:socket",
+  "outputDirectory": "dist",
+  "devCommand": "bun run dev:socket"
 }
